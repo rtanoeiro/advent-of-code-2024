@@ -20,40 +20,45 @@ def create_word_matrix(string_input: list[str]):
 # horizontal, vertical, diagonal, written backwards
 def scan_matrix_part1(word_matrix: list[list[str]]):
     """This function will scan the matrix data and depending on the position we're in it will look to all directions"""
-    matrix_size = len(word_matrix)
-    length = len("XMAS")
+    desired = "XMAS"
     finds = 0
     for index_line, line in enumerate(word_matrix):
-        if index_line != matrix_size - 1:
-            # All lines have a line break by default, except the last one
-            line.remove("\n")
         for index_column, _ in enumerate(line):
-            finds += scan_all_directions(word_matrix, index_line, index_column, length)
+            finds += scan_all_directions(
+                word_matrix, index_line, index_column, len(desired), desired
+            )
     return finds
 
 
 def scan_matrix_part2(word_matrix: list[list[str]]):
     """This function will scan the matrix data and depending on the position we're in it will look to all directions"""
-    matrix_size = len(word_matrix)
     finds = 0
-    length = len("A")
+    desired_backwards = "M"
+    desired_forward = "S"
     for index_line, line in enumerate(word_matrix):
-        if index_line != matrix_size - 1:
-            # All lines have a line break by default, except the last one
-            line.remove("\n")
         for index_column, _ in enumerate(line):
-            if word_matrix[index_line][index_column] == "A"
+            if word_matrix[index_line][index_column] == "A":
+                finds += scan_diagonally()
 
-                finds += scan_diagonally(word_matrix, index_line, index_column, length)
-    
+            pass
+
     return finds
 
 
 def scan_all_directions(word_matrix, line_index, col_index, length, desired):
     index_matches = 0
-    index_matches += scan_horizontally(word_matrix, line_index, col_index, length, desired)
-    index_matches += scan_vertically(word_matrix, line_index, col_index, length, desired)
-    index_matches += scan_diagonally(word_matrix, line_index, col_index, length, desired)
+    index_matches += scan_horizontally(
+        word_matrix, line_index, col_index, length, desired
+    )
+    index_matches += scan_vertically(
+        word_matrix, line_index, col_index, length, desired
+    )
+    index_matches += scan_diagonally_forward(
+        word_matrix, line_index, col_index, length, desired
+    )
+    index_matches += scan_diagonally_backward(
+        word_matrix, line_index, col_index, length, desired
+    )
     return index_matches
 
 
@@ -62,7 +67,7 @@ def scan_horizontally(word_matrix, line_index, col_index, length, desired):
     word = forward_horizontal(word_matrix, line_index, col_index, length)
     reversed_word = backward_horizontal(word_matrix, line_index, col_index, length)
     index_matches += validate_word(word, desired)
-    index_matches += validate_word(reversed_word,desired)
+    index_matches += validate_word(reversed_word, desired)
 
     return index_matches
 
@@ -79,7 +84,7 @@ def scan_vertically(word_matrix, line_index, col_index, length, desired):
     return index_matches
 
 
-def scan_diagonally(word_matrix, line_index, col_index, length, desired):
+def scan_diagonally_forward(word_matrix, line_index, col_index, length, desired):
     index_matches = 0
 
     forward_upward_word = forward_upward_diagonal(
@@ -88,6 +93,16 @@ def scan_diagonally(word_matrix, line_index, col_index, length, desired):
     forward_downward_word = forward_downard_diagonal(
         word_matrix, line_index, col_index, length
     )
+
+    index_matches += validate_word(forward_upward_word, desired)
+    index_matches += validate_word(forward_downward_word, desired)
+
+    return index_matches
+
+
+def scan_diagonally_backwards(word_matrix, line_index, col_index, length, desired):
+    index_matches = 0
+
     backward_upward_word = backward_upward_diagonal(
         word_matrix, line_index, col_index, length
     )
@@ -95,8 +110,6 @@ def scan_diagonally(word_matrix, line_index, col_index, length, desired):
         word_matrix, line_index, col_index, length
     )
 
-    index_matches += validate_word(forward_upward_word, desired)
-    index_matches += validate_word(forward_downward_word, desired)
     index_matches += validate_word(backward_upward_word, desired)
     index_matches += validate_word(backward_downward_word, desired)
 
@@ -256,7 +269,6 @@ def backward_upward_diagonal(
 
 data = create_srting_from_input("day_4_input.txt")
 word_matrix = create_word_matrix(data)
-# word_matrix = word_matrix[:12]
 results_part_1 = scan_matrix_part1(word_matrix)
 results_part_2 = scan_matrix_part2(word_matrix)
 print(f"The total number of XMAS findings is {results_part_1}")
