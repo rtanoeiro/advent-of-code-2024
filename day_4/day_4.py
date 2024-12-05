@@ -36,9 +36,27 @@ def scan_matrix_part2(word_matrix: list[list[str]]):
     desired_backwards = "M"
     desired_forward = "S"
     for index_line, line in enumerate(word_matrix):
+        if index_line == 0:
+            continue
         for index_column, _ in enumerate(line):
             if word_matrix[index_line][index_column] == "A":
-                finds += scan_diagonally()
+                up_forward = get_single_char(
+                    word_matrix, index_line - 1, index_column + 1
+                )
+                down_forward = get_single_char(
+                    word_matrix, index_line + 1, index_column + 1
+                )
+                up_backwards = get_single_char(
+                    word_matrix, index_line - 1, index_column - 1
+                )
+                down_backwards = get_single_char(
+                    word_matrix, index_line + 1, index_column - 1
+                )
+
+                finds += validate_word(up_forward, desired_forward)
+                finds += validate_word(down_forward, desired_forward)
+                finds += validate_word(up_backwards, desired_backwards)
+                finds += validate_word(down_backwards, desired_backwards)
 
             pass
 
@@ -56,7 +74,7 @@ def scan_all_directions(word_matrix, line_index, col_index, length, desired):
     index_matches += scan_diagonally_forward(
         word_matrix, line_index, col_index, length, desired
     )
-    index_matches += scan_diagonally_backward(
+    index_matches += scan_diagonally_backwards(
         word_matrix, line_index, col_index, length, desired
     )
     return index_matches
@@ -250,10 +268,10 @@ def backward_upward_diagonal(
     word_matrix,
     line_index: int,
     col_index: int,
-    lenght: int,
+    length: int,
 ):
-    line_range = range(line_index, line_index - lenght, -1)
-    col_range = range(col_index, col_index - lenght, -1)
+    line_range = range(line_index, line_index - length, -1)
+    col_range = range(col_index, col_index - length, -1)
     try:
         word = "".join(
             [
@@ -267,8 +285,23 @@ def backward_upward_diagonal(
     return word
 
 
+def get_single_char(
+    word_matrix,
+    line_index: int,
+    col_index: int,
+):
+    line_index = line_index
+    col_index = col_index
+    try:
+        word = "".join([word_matrix[line_index][col_index]])
+    except IndexError:
+        word = None
+    return word
+
+
 data = create_srting_from_input("day_4_input.txt")
 word_matrix = create_word_matrix(data)
-results_part_1 = scan_matrix_part1(word_matrix)
+# results_part_1 = scan_matrix_part1(word_matrix)
 results_part_2 = scan_matrix_part2(word_matrix)
-print(f"The total number of XMAS findings is {results_part_1}")
+# print(f"The total number of XMAS findings is {results_part_1}")
+print(f"The total number of X-MAS findings is {results_part_2}")
